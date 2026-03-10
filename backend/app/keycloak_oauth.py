@@ -14,8 +14,6 @@ from starlette.exceptions import HTTPException
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from app.api.deps import SessionDep
-from app.crud import create_user, get_user_by_email
 from app.models import UserCreate, UserKC
 
 logger = logging.getLogger(__name__)
@@ -23,7 +21,11 @@ logger = logging.getLogger(__name__)
 class KeycloakOAuth2:
     def __init__(
         self,
+        *,
         client_id: str,
+        get_session,
+        get_user_id,
+        create_user,
         client_secret: str | bytes | None,
         base_url: str, # base oauth provider url
         authorize_path: str,
@@ -40,6 +42,9 @@ class KeycloakOAuth2:
         self._logout_target = logout_target # where to redirect after logout
         self._client_id = client_id
         self._base_url = base_url
+        self._get_session = get_session
+        self._get_user_id = get_user_id
+        self._create_user = create_user
 
         oauth = OAuth()
 
@@ -118,7 +123,7 @@ class KeycloakOAuth2:
         )
 
     # Callback where we are sent by oauth provider
-    async def oauth_callback(self, request: Request, session: SessionDep) -> RedirectResponse:
+    async def oauth_callback(self, request: Request) -> RedirectResponse:
         """Authorize user with Keycloak access token."""
         token = await self.keycloak.authorize_access_token(request)
         claims = await self.parse_claims(token)
@@ -135,7 +140,13 @@ class KeycloakOAuth2:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid auth server token (no email)"
             )
-        db_user = get_user_by_email(session=session, email=email)
+        if (session := self._get_session()) is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Cannot access db"
+            )
+
+        user_id = self._get_user_id(session=session, email=email)
         # id = db_user.id if db_user is not None else get_new_id()
         user = UserKC(
             name=claims["preferred_username"],
@@ -143,16 +154,16 @@ class KeycloakOAuth2:
             roles=roles,
             token=token["access_token"],
         )
-        if db_user is None:
+        if user_id is None:
             user_create=UserCreate(
                 password='dummypassword', # TODO: remove passwords
                 is_active=True,
                 is_superuser=True,
                 email=email
             )
-            create_user(session=session, user_create=user_create)
+            self._create_user(session=session, user_create=user_create)
         else:
-            user.id = db_user.id
+            user.id = user_id
 
         request.session["user"] = user.model_dump(mode="json")
         # Where to redirect after successful login, normally should be set in '../auth/login?redirect_uri=...'
