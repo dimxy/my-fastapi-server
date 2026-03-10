@@ -40,7 +40,7 @@ Install fastapi demo frontend
 npm i
 ```
 
-Setup the app .env file:
+Setup the app .env file (use .env.example as a sample):
 - fix your keycloak base url, client id and secret 
 
 
