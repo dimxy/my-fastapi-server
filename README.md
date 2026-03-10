@@ -2,7 +2,7 @@
 
 This repo adds OAuth2 authentication support with KeyCloak server as OAuth2 provider for FastAPI template server (Dashboard demo app)
 
-## Install and run
+### Install and set keycloak, postgresql, backend and frontend 
 
 Create a volume for keycloak data in /opt:
 ```
@@ -56,25 +56,30 @@ Run postgresql:
 LC_ALL=en_US.UTF-8  /usr/local/opt/postgresql@18/bin/postgres -D /usr/local/var/postgresql@18
 ```
 
-Run alembic DB install
+Run alembic DB creation scripts:
+```
 backend/scripts/prestart.sh
-
+```
 
 Start backend:
 ```
+go to app directory
 cd backend
 fastapi run app/main.py
 ```
 
 Start demo frontend:
 ```
+go to app directory
+cd frontend
 npm run dev
 ```
 
 Navigate to the app url, like http://localhost:5173
 
 
-# Original FastAPI remplate app README
+
+**Original FastAPI template app README:**<br>
 https://github.com/fastapi/full-stack-fastapi-template/blob/master/README.md
 
 
