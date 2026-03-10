@@ -4,13 +4,13 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from keycloak_py.keycloak_login import get_current_user, CurrentUser
 
 from app import crud
-from app.api.deps import CurrentUser, SessionDep, get_current_user
+from app.api.deps import SessionDep
 from app.core import security
 from app.core.config import settings
 from app.models import Message, NewPassword, Token, UserPublic, UserUpdate
-from app.keycloak_oauth import KeycloakOAuth2
 from app.utils import (
     generate_password_reset_token,
     generate_reset_password_email,

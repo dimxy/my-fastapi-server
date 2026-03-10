@@ -2,10 +2,10 @@ import uuid
 from typing import Any
 
 from sqlmodel import Field, Session, select
+from pydantic import BaseModel, EmailStr
 
 from app.core.security import get_password_hash, verify_password
 from app.models import Item, ItemCreate, UserCreate, UserDB, UserUpdate
-
 
 def create_user(*, session: Session, user_create: UserCreate) -> UserDB:
     db_obj = UserDB.model_validate(
@@ -16,6 +16,20 @@ def create_user(*, session: Session, user_create: UserCreate) -> UserDB:
     session.refresh(db_obj)
     return db_obj
 
+def create_oauth_user(*, session: Session, email: EmailStr, is_superuser: bool, is_active: bool) -> uuid.UUID:
+    user_create = UserCreate(
+        email=email,
+        password='',
+        is_superuser=is_superuser,
+        is_active=is_active,
+    )
+    db_obj = UserDB.model_validate(
+        user_create, update={"hashed_password": get_password_hash(user_create.password)}
+    )
+    session.add(db_obj)
+    session.commit()
+    session.refresh(db_obj)
+    return db_obj.id
 
 def update_user(*, session: Session, db_user: UserDB, user_in: UserUpdate) -> Any:
     user_data = user_in.model_dump(exclude_unset=True)
@@ -30,6 +44,12 @@ def update_user(*, session: Session, db_user: UserDB, user_in: UserUpdate) -> An
     session.refresh(db_user)
     return db_user
 
+
+def get_user_id(*, session: Session, email: str) -> uuid.UUID | None:
+    session_user = get_user_by_email(session=session, email=email)
+    if session_user is not None:
+        return session_user.id
+    return session_user
 
 def get_user_by_email(*, session: Session, email: str) -> UserDB | None:
     statement = select(UserDB).where(UserDB.email == email)

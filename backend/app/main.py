@@ -3,14 +3,16 @@ import logging
 import sentry_sdk
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
+
+#from app.keycloak_oauth import KeycloakOAuth2
+from keycloak_py.keycloak_login import KeycloakOAuth2
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.api.deps import get_db
 from app.api.main import api_router
 from app.core.config import settings
-from app.crud import create_user, get_user_by_email
-from app.keycloak_oauth import KeycloakOAuth2
+from app.crud import create_oauth_user, get_user_id
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -33,8 +35,8 @@ else:
 
 keycloak = KeycloakOAuth2(
     get_session=get_db,
-    get_user_id=get_user_by_email,
-    create_user=create_user,
+    get_user_id=get_user_id,
+    create_user=create_oauth_user,
     client_id=settings.keycloak.client_id,
     client_secret=settings.keycloak.client_secret,
     base_url=base_url,

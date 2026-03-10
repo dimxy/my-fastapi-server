@@ -3,8 +3,9 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from sqlmodel import col, func, select
+from keycloak_py.keycloak_login import CurrentUser
 
-from app.api.deps import CurrentUser, SessionDep
+from app.api.deps import SessionDep
 from app.models import Item, ItemCreate, ItemPublic, ItemsPublic, ItemUpdate, Message
 
 router = APIRouter(prefix="/items", tags=["items"])

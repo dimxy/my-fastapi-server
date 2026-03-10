@@ -4,13 +4,10 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import col, delete, func, select
+from keycloak_py.keycloak_login import get_current_user, CurrentUser, UserPublicKC
 
 from app import crud
-from app.api.deps import (
-    CurrentUser,
-    SessionDep,
-    get_current_user,
-)
+from app.api.deps import SessionDep
 from app.core.config import settings
 from app.core.security import get_password_hash, verify_password
 from app.models import (
@@ -20,7 +17,6 @@ from app.models import (
     UserCreate,
     UserDB,
     UserPublic,
-    UserPublicKC,
     UserRegister,
     UsersPublic,
     UserUpdate,

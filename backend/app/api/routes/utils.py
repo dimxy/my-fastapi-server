@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends
 from pydantic.networks import EmailStr
+from keycloak_py.keycloak_login import get_current_user
 
-from app.api.deps import get_current_user
 from app.models import Message
-from app.keycloak_oauth import KeycloakOAuth2
 from app.utils import generate_test_email, send_email
 
 router = APIRouter(prefix="/utils", tags=["utils"])

@@ -12,7 +12,7 @@ from starlette.requests import Request
 from app.core import security
 from app.core.config import settings
 from app.core.db import engine
-from app.models import TokenPayload, UserDB, UserKC
+from app.models import TokenPayload, UserDB
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/access-token"
@@ -49,22 +49,11 @@ def get_current_user_old(session: SessionDep, token: TokenDep) -> UserDB:
     return user
 
 
-def get_current_user(request: Request) -> UserKC:
-    if (user := request.session.get("user")) is not None:
-        return UserKC.model_validate(user)
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"}, # TODO: need this header?
-        )
-
-CurrentUser = Annotated[UserKC, Depends(get_current_user)]
-
-
+'''
 def get_current_active_superuser_000(current_user: CurrentUser) -> UserKC:
     if not current_user.is_superuser:
         raise HTTPException(
             status_code=403, detail="The user doesn't have enough privileges"
         )
     return current_user
+'''

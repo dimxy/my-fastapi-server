@@ -1,3 +1,4 @@
+from click import UUID
 import uuid
 from datetime import datetime, timezone
 
@@ -60,23 +61,6 @@ class UserDB(UserBase, table=True):
 # Properties to return via API, id is always required
 class UserPublic(UserBase):
     id: uuid.UUID
-    created_at: datetime | None = None
-
-# Keycloak user
-class UserKC(BaseModel):
-    name: str
-    hashed_password: str = '' # not used
-    email: EmailStr | None
-    roles: list[str]
-    """Complete access token. Required for token propagation."""
-    token: str
-    is_superuser: bool = True
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-
-# Keycloak public user
-class UserPublicKC(BaseModel):
-    name: str
-    email: EmailStr | None
     created_at: datetime | None = None
 
 class UsersPublic(SQLModel):
@@ -144,4 +128,3 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=128)
-
