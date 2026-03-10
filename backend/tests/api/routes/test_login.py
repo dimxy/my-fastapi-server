@@ -7,7 +7,7 @@ from sqlmodel import Session
 from app.core.config import settings
 from app.core.security import get_password_hash, verify_password
 from app.crud import create_user
-from app.models import User, UserCreate
+from app.models import UserDB, UserCreate
 from app.utils import generate_password_reset_token
 from tests.utils.user import user_authentication_headers
 from tests.utils.utils import random_email, random_lower_string
@@ -138,7 +138,7 @@ def test_login_with_bcrypt_password_upgrades_to_argon2(
     bcrypt_hash = bcrypt_hasher.hash(password)
     assert bcrypt_hash.startswith("$2")  # bcrypt hashes start with $2
 
-    user = User(email=email, hashed_password=bcrypt_hash, is_active=True)
+    user = UserDB(email=email, hashed_password=bcrypt_hash, is_active=True)
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -172,7 +172,7 @@ def test_login_with_argon2_password_keeps_hash(client: TestClient, db: Session) 
     assert argon2_hash.startswith("$argon2")
 
     # Create user with argon2 hash
-    user = User(email=email, hashed_password=argon2_hash, is_active=True)
+    user = UserDB(email=email, hashed_password=argon2_hash, is_active=True)
     db.add(user)
     db.commit()
     db.refresh(user)

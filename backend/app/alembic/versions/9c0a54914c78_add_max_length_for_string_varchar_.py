@@ -19,13 +19,13 @@ depends_on = None
 
 def upgrade():
     # Adjust the length of the email field in the User table
-    op.alter_column('user', 'email',
+    op.alter_column('userdb', 'email',
                existing_type=sa.String(),
                type_=sa.String(length=255),
                existing_nullable=False)
 
     # Adjust the length of the full_name field in the User table
-    op.alter_column('user', 'full_name',
+    op.alter_column('userdb', 'full_name',
                existing_type=sa.String(),
                type_=sa.String(length=255),
                existing_nullable=True)
@@ -45,13 +45,13 @@ def upgrade():
 
 def downgrade():
     # Revert the length of the email field in the User table
-    op.alter_column('user', 'email',
+    op.alter_column('userdb', 'email',
                existing_type=sa.String(length=255),
                type_=sa.String(),
                existing_nullable=False)
 
     # Revert the length of the full_name field in the User table
-    op.alter_column('user', 'full_name',
+    op.alter_column('userdb', 'full_name',
                existing_type=sa.String(length=255),
                type_=sa.String(),
                existing_nullable=True)

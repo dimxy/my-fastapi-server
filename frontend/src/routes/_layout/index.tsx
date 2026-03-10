@@ -14,6 +14,7 @@ export const Route = createFileRoute("/_layout/")({
 })
 
 function Dashboard() {
+  console.log('Dashboard entered')
   const { user: currentUser } = useAuth()
 
   return (

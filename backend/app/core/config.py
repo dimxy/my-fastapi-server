@@ -1,9 +1,11 @@
+# Based on this repo: https://github.com/bakdata/python-keycloak-oauth
 import secrets
 import warnings
 from typing import Annotated, Any, Literal
 
 from pydantic import (
     AnyUrl,
+    BaseModel,
     BeforeValidator,
     EmailStr,
     HttpUrl,
@@ -22,13 +24,26 @@ def parse_cors(v: Any) -> list[str] | str:
         return v
     raise ValueError(v)
 
+class KeycloakSettings(BaseModel):
+    client_id: str
+    client_secret: str = '' # for use with test non-authorising keycloak server
+    base_url_local: str
+    base_url_staging: str
+    base_url_prod: str
+    authorize_path: str
+    access_token_path: str
+    server_metadata_path: str
+    logout_path: str
+    client_kwargs: dict[str, Any] = {} # use this like KEYCLOAK__CLIENT_KWARGS__VERIFY=true to set {"verify"=true}
 
 class Settings(BaseSettings):
+    keycloak: KeycloakSettings
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)
         env_file="../.env",
         env_ignore_empty=True,
-        extra="ignore",
+        extra="allow", # enable kwargs
+        env_nested_delimiter='__', # Use double underscore for nesting. A variable FOO__BAR__BAZ=123 is converted as FOO={'BAR': {'BAZ': 123}}. Case insensitive
     )
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
@@ -112,8 +127,6 @@ class Settings(BaseSettings):
         self._check_default_secret(
             "FIRST_SUPERUSER_PASSWORD", self.FIRST_SUPERUSER_PASSWORD
         )
-
         return self
-
 
 settings = Settings()  # type: ignore

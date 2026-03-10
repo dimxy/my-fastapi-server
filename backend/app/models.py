@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from pydantic import EmailStr
+from pydantic import BaseModel, EmailStr
 from sqlalchemy import DateTime
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -46,7 +46,8 @@ class UpdatePassword(SQLModel):
 
 
 # Database model, database table inferred from class name
-class User(UserBase, table=True):
+# NOTE previous name was 'User' and apparently it is a special name for alembic (alembic created 'user' table incorrectly, with a single column 'user')
+class UserDB(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
     created_at: datetime | None = Field(
@@ -61,6 +62,22 @@ class UserPublic(UserBase):
     id: uuid.UUID
     created_at: datetime | None = None
 
+# Keycloak user
+class UserKC(BaseModel):
+    name: str
+    hashed_password: str = '' # not used
+    email: EmailStr | None
+    roles: list[str]
+    """Complete access token. Required for token propagation."""
+    token: str
+    is_superuser: bool = True
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+
+# Keycloak public user
+class UserPublicKC(BaseModel):
+    name: str
+    email: EmailStr | None
+    created_at: datetime | None = None
 
 class UsersPublic(SQLModel):
     data: list[UserPublic]
@@ -91,9 +108,9 @@ class Item(ItemBase, table=True):
         sa_type=DateTime(timezone=True),  # type: ignore
     )
     owner_id: uuid.UUID = Field(
-        foreign_key="user.id", nullable=False, ondelete="CASCADE"
+        foreign_key="userdb.id", nullable=False, ondelete="CASCADE"
     )
-    owner: User | None = Relationship(back_populates="items")
+    owner: UserDB | None = Relationship(back_populates="items")
 
 
 # Properties to return via API, id is always required
@@ -127,3 +144,4 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=128)
+

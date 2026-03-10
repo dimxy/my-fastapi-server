@@ -1,14 +1,14 @@
 import uuid
 from typing import Any
 
-from sqlmodel import Session, select
+from sqlmodel import Field, Session, select
 
 from app.core.security import get_password_hash, verify_password
-from app.models import Item, ItemCreate, User, UserCreate, UserUpdate
+from app.models import Item, ItemCreate, UserCreate, UserDB, UserUpdate
 
 
-def create_user(*, session: Session, user_create: UserCreate) -> User:
-    db_obj = User.model_validate(
+def create_user(*, session: Session, user_create: UserCreate) -> UserDB:
+    db_obj = UserDB.model_validate(
         user_create, update={"hashed_password": get_password_hash(user_create.password)}
     )
     session.add(db_obj)
@@ -17,7 +17,7 @@ def create_user(*, session: Session, user_create: UserCreate) -> User:
     return db_obj
 
 
-def update_user(*, session: Session, db_user: User, user_in: UserUpdate) -> Any:
+def update_user(*, session: Session, db_user: UserDB, user_in: UserUpdate) -> Any:
     user_data = user_in.model_dump(exclude_unset=True)
     extra_data = {}
     if "password" in user_data:
@@ -31,8 +31,8 @@ def update_user(*, session: Session, db_user: User, user_in: UserUpdate) -> Any:
     return db_user
 
 
-def get_user_by_email(*, session: Session, email: str) -> User | None:
-    statement = select(User).where(User.email == email)
+def get_user_by_email(*, session: Session, email: str) -> UserDB | None:
+    statement = select(UserDB).where(UserDB.email == email)
     session_user = session.exec(statement).first()
     return session_user
 
@@ -42,7 +42,7 @@ def get_user_by_email(*, session: Session, email: str) -> User | None:
 DUMMY_HASH = "$argon2id$v=19$m=65536,t=3,p=4$MjQyZWE1MzBjYjJlZTI0Yw$YTU4NGM5ZTZmYjE2NzZlZjY0ZWY3ZGRkY2U2OWFjNjk"
 
 
-def authenticate(*, session: Session, email: str, password: str) -> User | None:
+def authenticate(*, session: Session, email: str, password: str) -> UserDB | None:
     db_user = get_user_by_email(session=session, email=email)
     if not db_user:
         # Prevent timing attacks by running password verification even when user doesn't exist
@@ -66,3 +66,7 @@ def create_item(*, session: Session, item_in: ItemCreate, owner_id: uuid.UUID) -
     session.commit()
     session.refresh(db_item)
     return db_item
+
+def get_new_id() -> uuid.UUID:
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    return id

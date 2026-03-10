@@ -49,7 +49,7 @@ export const OpenAPI: OpenAPIConfig = {
 	TOKEN: undefined,
 	USERNAME: undefined,
 	VERSION: '0.1.0',
-	WITH_CREDENTIALS: false,
+	WITH_CREDENTIALS: true, // NOTE: needs true to send session cookie (with oauth token)
 	interceptors: {
 		request: new Interceptors(),
 		response: new Interceptors(),

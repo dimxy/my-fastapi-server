@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import type { Body_login_login_access_token as AccessToken } from "@/client"
-import { AuthLayout } from "@/components/Common/AuthLayout"
+/*import { AuthLayout } from "@/components/Common/AuthLayout"
 import {
   Form,
   FormControl,
@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { LoadingButton } from "@/components/ui/loading-button"
-import { PasswordInput } from "@/components/ui/password-input"
+import { PasswordInput } from "@/components/ui/password-input"*/
 import useAuth, { isLoggedIn } from "@/hooks/useAuth"
 
 const formSchema = z.object({
@@ -51,8 +51,13 @@ export const Route = createFileRoute("/login")({
 })
 
 function Login() {
-  const { loginMutation } = useAuth()
-  const form = useForm<FormData>({
+  console.log('Login entered')
+  const { loginMutation, login } = useAuth()
+  login({
+    username: "",
+    password: ""
+  })
+  /*const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onBlur",
     criteriaMode: "all",
@@ -138,5 +143,5 @@ function Login() {
         </form>
       </Form>
     </AuthLayout>
-  )
+  )*/
 }
