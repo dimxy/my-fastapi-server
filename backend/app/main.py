@@ -3,6 +3,7 @@ import logging
 import sentry_sdk
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
+import truststore
 
 #from app.keycloak_oauth import KeycloakOAuth2
 from keycloak_py.keycloak_login import KeycloakOAuth2
@@ -16,6 +17,8 @@ from app.crud import create_oauth_user, get_user_id
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+truststore.inject_into_ssl()
 
 def custom_generate_unique_id(route: APIRoute) -> str:
     return f"{route.tags[0]}-{route.name}"
