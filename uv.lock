@@ -894,7 +894,7 @@ wheels = [
 [[package]]
 name = "keycloak-py"
 version = "0.1.0"
-source = { git = "https://github.com/dimxy/keycloak-py.git#91403f37ca3262468447dce2c18767505b211efc" }
+source = { git = "https://github.com/dimxy/keycloak-py.git#9d07ad31a535adacd736801c1dd73f27a2f3d4b1" }
 dependencies = [
     { name = "authlib" },
     { name = "fastapi" },

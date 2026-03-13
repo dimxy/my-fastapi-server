@@ -2,8 +2,8 @@ import uuid
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
-from sqlmodel import col, func, select
 from keycloak_py.keycloak_login import CurrentUser
+from sqlmodel import col, func, select
 
 from app.api.deps import SessionDep
 from app.models import Item, ItemCreate, ItemPublic, ItemsPublic, ItemUpdate, Message

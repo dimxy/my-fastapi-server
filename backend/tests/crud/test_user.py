@@ -16,7 +16,7 @@ def test_create_user(db: Session) -> None:
     assert user.email == email
     assert hasattr(user, "hashed_password")
 
-
+# TODO: fix for keycloak
 def test_authenticate_user(db: Session) -> None:
     email = random_email()
     password = random_lower_string()
@@ -26,7 +26,7 @@ def test_authenticate_user(db: Session) -> None:
     assert authenticated_user
     assert user.email == authenticated_user.email
 
-
+# TODO: fix for keycloak
 def test_not_authenticate_user(db: Session) -> None:
     email = random_email()
     password = random_lower_string()

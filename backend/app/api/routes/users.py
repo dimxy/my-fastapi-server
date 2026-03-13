@@ -3,26 +3,22 @@ import uuid
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
+from keycloak_py.keycloak_login import CurrentUser, UserPublicKC, get_current_user
 from sqlmodel import col, delete, func, select
-from keycloak_py.keycloak_login import get_current_user, CurrentUser, UserPublicKC
 
 from app import crud
 from app.api.deps import SessionDep
-from app.core.config import settings
-from app.core.security import get_password_hash, verify_password
+from app.core.security import verify_password
 from app.models import (
     Item,
     Message,
     UpdatePassword,
-    UserCreate,
     UserDB,
     UserPublic,
-    UserRegister,
     UsersPublic,
     UserUpdate,
     UserUpdateMe,
 )
-from app.utils import generate_new_account_email, send_email
 
 router = APIRouter(prefix="/users", tags=["users"])
 logger = logging.getLogger(__name__)
@@ -47,34 +43,6 @@ def read_users(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
 
     return UsersPublic(data=users, count=count)
 
-
-@router.post(
-    "/", dependencies=[Depends(get_current_user)], response_model=UserPublic # TODO wrong UserPublic
-)
-def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
-    """
-    Create new user.
-    """
-    user = crud.get_user_by_email(session=session, email=user_in.email)
-    if user:
-        raise HTTPException(
-            status_code=400,
-            detail="The user with this email already exists in the system.",
-        )
-
-    user = crud.create_user(session=session, user_create=user_in)
-    if settings.emails_enabled and user_in.email:
-        email_data = generate_new_account_email(
-            email_to=user_in.email, username=user_in.email, password=user_in.password
-        )
-        send_email(
-            email_to=user_in.email,
-            subject=email_data.subject,
-            html_content=email_data.html_content,
-        )
-    return user
-
-
 @router.patch("/me", response_model=UserPublic)
 def update_user_me(
     *, session: SessionDep, user_in: UserUpdateMe, current_user: CurrentUser
@@ -85,15 +53,19 @@ def update_user_me(
 
     if user_in.email:
         existing_user = crud.get_user_by_email(session=session, email=user_in.email)
-        if existing_user and existing_user.id != current_user.id:
+        if not existing_user:
             raise HTTPException(
-                status_code=409, detail="User with this email already exists"
+                status_code=409, detail="User was deleted"
             )
-    user_data = user_in.model_dump(exclude_unset=True)
-    current_user.sqlmodel_update(user_data) # TODO: fix user
-    session.add(current_user)
-    session.commit()
-    session.refresh(current_user)
+        if existing_user.id != current_user.id:
+            raise HTTPException(
+                status_code=409, detail="Another user with this email already exists"
+            )
+        user_data = user_in.model_dump(exclude_unset=True)
+        existing_user.sqlmodel_update(user_data) # TODO: fix user
+        session.add(existing_user)
+        session.commit()
+        session.refresh(existing_user)
     return current_user
 
 
@@ -111,11 +83,10 @@ def update_password_me(
         raise HTTPException(
             status_code=400, detail="New password cannot be the same as the current one"
         )
-    hashed_password = get_password_hash(body.new_password)
-    current_user.hashed_password = hashed_password
-    session.add(current_user)
-    session.commit()
-    return Message(message="Password updated successfully")
+    # hashed_password = get_password_hash(body.new_password)
+    raise HTTPException(
+        status_code=400, detail="Not supported yet"
+    )
 
 
 @router.get("/me", response_model=UserPublicKC)
@@ -139,23 +110,6 @@ def delete_user_me(session: SessionDep, current_user: CurrentUser) -> Any:
     session.commit()
     return Message(message="User deleted successfully")
 
-
-@router.post("/signup", response_model=UserPublic)
-def register_user(session: SessionDep, user_in: UserRegister) -> Any:
-    """
-    Create new user without the need to be logged in.
-    """
-    user = crud.get_user_by_email(session=session, email=user_in.email)
-    if user:
-        raise HTTPException(
-            status_code=400,
-            detail="The user with this email already exists in the system",
-        )
-    user_create = UserCreate.model_validate(user_in)
-    user = crud.create_user(session=session, user_create=user_create)
-    return user
-
-
 @router.get("/{user_id}", response_model=UserPublic)
 def read_user_by_id(
     user_id: uuid.UUID, session: SessionDep, current_user: CurrentUser
@@ -164,7 +118,7 @@ def read_user_by_id(
     Get a specific user by id.
     """
     user = session.get(UserDB, user_id)
-    if user == current_user:
+    if user_id == current_user.id:
         return user
     if not current_user.is_superuser:
         raise HTTPException(
@@ -184,13 +138,18 @@ def read_user_by_id(
 def update_user(
     *,
     session: SessionDep,
+    current_user: CurrentUser,
     user_id: uuid.UUID,
     user_in: UserUpdate,
 ) -> Any:
     """
     Update a user.
     """
-
+    if not current_user.is_superuser:
+        raise HTTPException(
+            status_code=403,
+            detail="The user doesn't have enough privileges",
+        )
     db_user = session.get(UserDB, user_id)
     if not db_user:
         raise HTTPException(
@@ -215,10 +174,15 @@ def delete_user(
     """
     Delete a user.
     """
+    if not current_user.is_superuser:
+        raise HTTPException(
+            status_code=403,
+            detail="The user doesn't have enough privileges",
+        )
     user = session.get(UserDB, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    if user == current_user:
+    if user_id == current_user.id:
         raise HTTPException(
             status_code=403, detail="Super users are not allowed to delete themselves"
         )
