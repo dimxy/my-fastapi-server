@@ -17,6 +17,8 @@ const isLoggedIn = () => {
 const apiBase: string = import.meta.env.VITE_API_URL || "http://localhost:8000";
 const apiUrl: string = `${apiBase}/api/v1`;
 
+const homePage: string = "/generate-video"
+
 const getUser = () : string | null => {
   return localStorage.getItem("logged_user")
 }
@@ -63,7 +65,7 @@ const useAuth = () => {
       if (res.status === 401) {
         // Yes we should navigate to the login API call. Otherwise, if we do 'fetch', we will get CORS error when connecting to keycloak.
         // In fact, this is actual for localhost connections, in prod this would not matter if connect via proxy. 
-        window.location.href = `${apiUrl}/auth/login?redirect_uri=${window.location.origin}/items`;
+        window.location.href = `${apiUrl}/auth/login?redirect_uri=${window.location.origin}/generate-video`;
         setUser(null);
         return null;
       }
@@ -73,7 +75,7 @@ const useAuth = () => {
       if (resJson?.email) {
         console.log("Setting user:", JSON.stringify(resJson));
         setUser(resJson?.email);
-        window.location.href = "/items";
+        window.location.href = "/generate-video";
       }
     })
     .catch((err) => {
@@ -92,7 +94,7 @@ const useAuth = () => {
   })
 
   const logout = () => {
-    window.location.href = `${apiUrl}/auth/logout?redirect_uri=${window.location.origin}/items`;
+    window.location.href = `${apiUrl}/auth/logout?redirect_uri=${window.location.origin}/generate-video`;
     setUser(null);
     /* NOTE: this does not work with keycloak due to cors issues. In fact only the navigate mode (setting window.location.href) works okay:
     fetch(`${apiUrl}/auth/logout?redirect_uri=${window.location.origin}/`, {
