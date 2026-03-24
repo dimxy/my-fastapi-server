@@ -129,4 +129,5 @@ class Settings(BaseSettings):
         )
         return self
 
+    HF_TOKEN: str
 settings = Settings()  # type: ignore

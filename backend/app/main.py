@@ -1,8 +1,10 @@
 import logging
+import os
 
 import sentry_sdk
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
+from fastapi.staticfiles import StaticFiles
 import truststore
 
 #from app.keycloak_oauth import KeycloakOAuth2
@@ -75,3 +77,4 @@ if settings.all_cors_origins:
 api_router.include_router(keycloak.router)
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.add_middleware(SessionMiddleware, secret_key=settings.keycloak.client_secret) # ty:ignore[invalid-argument-type] TODO: client_secret?
+app.mount("/static", StaticFiles(directory="static"), name="static")
