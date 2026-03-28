@@ -1,4 +1,5 @@
 # Based on this repo: https://github.com/bakdata/python-keycloak-oauth
+import os
 import secrets
 import warnings
 from typing import Annotated, Any, Literal
@@ -130,4 +131,10 @@ class Settings(BaseSettings):
         return self
 
     HF_TOKEN: str
+    VLLM_BASE_URL: HttpUrl | None = None
 settings = Settings()  # type: ignore
+
+
+def get_static_dir():
+    app_dir = os.getcwd()
+    return f'{app_dir}/static'

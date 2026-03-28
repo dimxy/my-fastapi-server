@@ -13,7 +13,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.api.deps import get_db
-from app.api.main import api_router
+from app.api.routes import api_router
 from app.core.config import settings
 from app.crud import create_oauth_user, get_user_id
 
@@ -76,5 +76,5 @@ if settings.all_cors_origins:
 
 api_router.include_router(keycloak.router)
 app.include_router(api_router, prefix=settings.API_V1_STR)
-app.add_middleware(SessionMiddleware, secret_key=settings.keycloak.client_secret) # ty:ignore[invalid-argument-type] TODO: client_secret?
+app.add_middleware(SessionMiddleware, secret_key=settings.keycloak.client_secret) # ty:ignore[invalid-argument-type]
 app.mount("/static", StaticFiles(directory="static"), name="static")

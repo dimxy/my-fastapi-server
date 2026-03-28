@@ -1,3 +1,4 @@
+from gradio_client.client import Job
 import logging
 import uuid
 from typing import Any
@@ -10,7 +11,6 @@ from app import crud
 from app.api.deps import SessionDep
 from app.core.security import verify_password
 from app.models import (
-    Item,
     Message,
     UpdatePassword,
     UserDB,
@@ -18,6 +18,7 @@ from app.models import (
     UsersPublic,
     UserUpdate,
     UserUpdateMe,
+    LlmJob,
 )
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -178,7 +179,7 @@ def delete_user(
         raise HTTPException(
             status_code=403, detail="Super users are not allowed to delete themselves"
         )
-    statement = delete(Item).where(col(Item.owner_id) == user_id)
+    statement = delete(LlmJob).where(col(LlmJob) == user_id)
     session.exec(statement)
     session.delete(user)
     session.commit()

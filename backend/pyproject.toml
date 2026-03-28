@@ -21,7 +21,10 @@ dependencies = [
     "pwdlib[argon2,bcrypt]>=0.3.0",
     "truststore>=0.10.4",
     "gradio_client>=2.3.0",
-    "keycloak-py@git+https://github.com/dimxy/keycloak-py.git"
+    "keycloak-py@git+https://github.com/dimxy/keycloak-py.git",
+    "openai>=2.30.0",
+    "locked-dict>=2023.10.22",
+    "litellm>=1.82.6",
 ]
 
 [dependency-groups]

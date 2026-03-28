@@ -5,7 +5,7 @@ from sqlmodel import Field, Session, select
 from pydantic import BaseModel, EmailStr
 
 from app.core.security import get_password_hash, verify_password
-from app.models import Item, ItemCreate, UserBase, UserDB, UserUpdate
+from app.models import LlmJob, LlmJobCreate, UserBase, UserDB, UserUpdate
 
 def create_user(*, session: Session, user_create: UserBase) -> UserDB:
     db_obj = UserDB.model_validate(user_create)
@@ -46,12 +46,17 @@ def get_user_by_email(*, session: Session, email: str) -> UserDB | None:
     session_user = session.exec(statement).first()
     return session_user
 
-def create_item(*, session: Session, item_in: ItemCreate, owner_id: uuid.UUID) -> Item:
-    db_item = Item.model_validate(item_in, update={"owner_id": owner_id})
-    session.add(db_item)
+def create_llm_job(*, session: Session, job_in: LlmJobCreate, owner_id: uuid.UUID) -> LlmJob:
+    db_job = LlmJob.model_validate(job_in, update={"owner_id": owner_id})
+    session.add(db_job)
     session.commit()
-    session.refresh(db_item)
-    return db_item
+    session.refresh(db_job)
+    return db_job
+
+def get_llm_job(*, session: Session, job_id: str) -> LlmJob | None:
+    statement = select(LlmJob).where(LlmJob.job_id == job_id)
+    session_user = session.exec(statement).first()
+    return session_user
 
 def get_new_id() -> uuid.UUID:
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)

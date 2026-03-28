@@ -41,7 +41,7 @@ class UserDB(UserBase, table=True):
         default_factory=get_datetime_utc,
         sa_type=DateTime(timezone=True),  # type: ignore
     )
-    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    job_ids: list["LlmJob"] = Relationship(back_populates="owner", cascade_delete=True)
 
 
 # Properties to return via API, id is always required
@@ -54,24 +54,28 @@ class UsersPublic(SQLModel):
     count: int
 
 
-# Shared properties
-class ItemBase(SQLModel):
-    title: str = Field(min_length=1, max_length=255)
-    description: str | None = Field(default=None, max_length=255)
+# Video generation job
+class LlmJobBase(SQLModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    prompt: str = Field(min_length=1, max_length=255)
+    job_id: str = Field(default=None, max_length=255)
+    file_path: str | None = Field(default=None, max_length=255)
+    is_finished: bool = Field(default=False)
 
 
-# Properties to receive on item creation
-class ItemCreate(ItemBase):
+# Properties to receive on LLM job creation
+class LlmJobCreate(LlmJobBase):
     pass
 
 
-# Properties to receive on item update
-class ItemUpdate(ItemBase):
-    title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
+# Properties to receive on job update
+class LlmJobUpdate(LlmJobBase):
+    file_path: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
+    is_finished: bool
 
 
 # Database model, database table inferred from class name
-class Item(ItemBase, table=True):
+class LlmJob(LlmJobBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
@@ -80,18 +84,18 @@ class Item(ItemBase, table=True):
     owner_id: uuid.UUID = Field(
         foreign_key="userdb.id", nullable=False, ondelete="CASCADE"
     )
-    owner: UserDB | None = Relationship(back_populates="items")
+    owner: UserDB | None = Relationship(back_populates="job_ids")
 
 
 # Properties to return via API, id is always required
-class ItemPublic(ItemBase):
+class LlmJobPublic(LlmJobBase):
     id: uuid.UUID
     owner_id: uuid.UUID
     created_at: datetime | None = None
 
 
-class ItemsPublic(SQLModel):
-    data: list[ItemPublic]
+class LlmJobsPublic(SQLModel):
+    data: list[LlmJobPublic]
     count: int
 
 
@@ -99,18 +103,18 @@ class ItemsPublic(SQLModel):
 class Message(SQLModel):
     message: str
 
-
+# Unused
 # JSON payload containing access token
 class Token(SQLModel):
     access_token: str
     token_type: str = "bearer"
 
-
+# Unused
 # Contents of JWT token
 class TokenPayload(SQLModel):
     sub: str | None = None
 
-
+# Unused
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=128)
