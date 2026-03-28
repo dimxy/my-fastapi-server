@@ -143,15 +143,8 @@ export const UserPublicKCSchema = {
             title: 'Name'
         },
         email: {
-            anyOf: [
-                {
-                    type: 'string',
-                    format: 'email'
-                },
-                {
-                    type: 'null'
-                }
-            ],
+            type: 'string',
+            format: 'email',
             title: 'Email'
         },
         created_at: {
@@ -165,10 +158,20 @@ export const UserPublicKCSchema = {
                 }
             ],
             title: 'Created At'
+        },
+        is_superuser: {
+            type: 'boolean',
+            title: 'Is Superuser',
+            default: false
+        },
+        id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Id'
         }
     },
     type: 'object',
-    required: ['name', 'email'],
+    required: ['name', 'email', 'id'],
     title: 'UserPublicKC'
 } as const;
 
@@ -295,14 +298,136 @@ export const ValidationErrorSchema = {
     title: 'ValidationError'
 } as const;
 
-export const VideoPublicSchema = {
+export const VideoObjectSchema = {
     properties: {
-        file_path: {
+        id: {
             type: 'string',
-            title: 'File Path'
+            title: 'Id'
+        },
+        object: {
+            type: 'string',
+            const: 'video',
+            title: 'Object'
+        },
+        status: {
+            type: 'string',
+            title: 'Status'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        },
+        completed_at: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Completed At'
+        },
+        expires_at: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Expires At'
+        },
+        error: {
+            anyOf: [
+                {
+                    additionalProperties: true,
+                    type: 'object'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Error'
+        },
+        progress: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Progress'
+        },
+        remixed_from_video_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Remixed From Video Id'
+        },
+        seconds: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Seconds'
+        },
+        size: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Size'
+        },
+        model: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Model'
+        },
+        usage: {
+            anyOf: [
+                {
+                    additionalProperties: true,
+                    type: 'object'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Usage'
         }
     },
     type: 'object',
-    required: ['file_path'],
-    title: 'VideoPublic'
+    required: ['id', 'object', 'status'],
+    title: 'VideoObject',
+    description: 'Represents a generated video object.'
 } as const;

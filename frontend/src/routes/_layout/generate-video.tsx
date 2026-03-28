@@ -1,5 +1,5 @@
-import { useState } from "react"
 import { createFileRoute } from "@tanstack/react-router"
+import { useState } from "react"
 
 export const Route = createFileRoute("/_layout/generate-video")({
   component: GenerateVideo,
@@ -57,7 +57,9 @@ function GenerateVideo() {
       setStatusMessage("Video generated successfully")
     } catch (error) {
       console.error(error)
-      setStatusMessage(error instanceof Error ? error.message : "Failed to generate video")
+      setStatusMessage(
+        error instanceof Error ? error.message : "Failed to generate video",
+      )
     } finally {
       setIsLoading(false)
     }
@@ -73,7 +75,10 @@ function GenerateVideo() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <label className="block text-sm font-medium text-muted-foreground" htmlFor="prompt">
+        <label
+          className="block text-sm font-medium text-muted-foreground"
+          htmlFor="prompt"
+        >
           Prompt
         </label>
         <input

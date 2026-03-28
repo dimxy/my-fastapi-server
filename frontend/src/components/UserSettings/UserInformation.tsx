@@ -1,3 +1,4 @@
+// Not used
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
@@ -39,7 +40,7 @@ const UserInformation = () => {
     mode: "onBlur",
     criteriaMode: "all",
     defaultValues: {
-      full_name: currentUser?.full_name ?? undefined,
+      full_name: currentUser?.name ?? undefined,
       email: currentUser?.email,
     },
   })
@@ -65,7 +66,7 @@ const UserInformation = () => {
     const updateData: UserUpdateMe = {}
 
     // only include fields that have changed
-    if (data.full_name !== currentUser?.full_name) {
+    if (data.full_name !== currentUser?.name) {
       updateData.full_name = data.full_name
     }
     if (data.email !== currentUser?.email) {

@@ -1,7 +1,4 @@
-import {
-  createFileRoute,
-  redirect,
-} from "@tanstack/react-router"
+import { createFileRoute, redirect } from "@tanstack/react-router"
 
 import useAuth, { isLoggedIn } from "@/hooks/useAuth"
 
@@ -24,7 +21,7 @@ export const Route = createFileRoute("/login")({
 })
 
 function Login() {
-  console.log('Login entered')
+  console.log("Login entered")
   const { login } = useAuth()
   login()
 }

@@ -3,7 +3,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { AuthLoginPageData, AuthLoginPageResponse, AuthLoginPage1Data, AuthLoginPage1Response, AuthOauthCallbackResponse, AuthLogoutResponse, AuthPublicKeysResponse, LlmsGenerateVideoData, LlmsGenerateVideoResponse, LlmsProcessChatData, LlmsProcessChatResponse, LlmsParseVoiceData, LlmsParseVoiceResponse, UsersReadUsersData, UsersReadUsersResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse } from './types.gen';
+import type { AuthLoginPageData, AuthLoginPageResponse, AuthOauthCallbackResponse, AuthLogoutResponse, AuthPublicKeysResponse, LlmsVideosPostData, LlmsVideosPostResponse, LlmsVideosGetResponse, LlmsProcessChatData, LlmsProcessChatResponse, LlmsParseVoiceData, LlmsParseVoiceResponse, UsersReadUsersData, UsersReadUsersResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse } from './types.gen';
 
 export class AuthService {
     /**
@@ -15,27 +15,6 @@ export class AuthService {
      * @throws ApiError
      */
     public static loginPage(data: AuthLoginPageData = {}): CancelablePromise<AuthLoginPageResponse> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/v1/auth/login',
-            query: {
-                redirect_target: data.redirectTarget
-            },
-            errors: {
-                422: 'Validation Error'
-            }
-        });
-    }
-    
-    /**
-     * Login Page
-     * Redirect to Keycloak login page.
-     * @param data The data for the request.
-     * @param data.redirectTarget
-     * @returns unknown Successful Response
-     * @throws ApiError
-     */
-    public static loginPage1(data: AuthLoginPage1Data = {}): CancelablePromise<AuthLoginPage1Response> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/auth/login',
@@ -89,23 +68,36 @@ export class AuthService {
 
 export class LlmsService {
     /**
-     * Generate Video
-     * Retrieve items.
+     * Videos Post
+     * Create video generation job.
      * @param data The data for the request.
-     * @param data.prompt
-     * @returns VideoPublic Successful Response
+     * @param data.userId
+     * @returns VideoObject Successful Response
      * @throws ApiError
      */
-    public static generateVideo(data: LlmsGenerateVideoData): CancelablePromise<LlmsGenerateVideoResponse> {
+    public static videosPost(data: LlmsVideosPostData): CancelablePromise<LlmsVideosPostResponse> {
         return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/v1/llms/generate_video',
+            method: 'POST',
+            url: '/api/v1/llms/videos',
             query: {
-                prompt: data.prompt
+                user_id: data.userId
             },
             errors: {
                 422: 'Validation Error'
             }
+        });
+    }
+    
+    /**
+     * Videos Get
+     * Get video generation job status and result, if completed.
+     * @returns VideoObject Successful Response
+     * @throws ApiError
+     */
+    public static videosGet(): CancelablePromise<LlmsVideosGetResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/llms/videos'
         });
     }
     

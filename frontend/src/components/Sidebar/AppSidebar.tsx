@@ -1,4 +1,4 @@
-import { Briefcase, Home, Users, Video, MessageCircle } from "lucide-react"
+import { Home, MessageCircle, Users, Video } from "lucide-react"
 
 import { SidebarAppearance } from "@/components/Common/Appearance"
 import { Logo } from "@/components/Common/Logo"
@@ -15,7 +15,7 @@ import { User } from "./User"
 const baseItems: Item[] = [
   { icon: Home, title: "Dashboard", path: "/" },
   { icon: Video, title: "Generate Video", path: "/generate-video" },
-//  { icon: MessageCircle, title: "Chatbot", path: "/chatbot" },
+  { icon: MessageCircle, title: "Chatbot", path: "/chatbot" },
 ]
 
 export function AppSidebar() {

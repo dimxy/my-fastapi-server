@@ -14,7 +14,7 @@ import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
 import { Route as LayoutSettingsRouteImport } from './routes/_layout/settings'
 import { Route as LayoutGenerateVideoRouteImport } from './routes/_layout/generate-video'
-import { Route as LayoutAdminRouteImport } from './routes/_layout/admin'
+import { Route as LayoutChatbotRouteImport } from './routes/_layout/chatbot'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -40,22 +40,22 @@ const LayoutGenerateVideoRoute = LayoutGenerateVideoRouteImport.update({
   path: '/generate-video',
   getParentRoute: () => LayoutRoute,
 } as any)
-const LayoutAdminRoute = LayoutAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const LayoutChatbotRoute = LayoutChatbotRouteImport.update({
+  id: '/chatbot',
+  path: '/chatbot',
   getParentRoute: () => LayoutRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof LayoutIndexRoute
   '/login': typeof LoginRoute
-  '/admin': typeof LayoutAdminRoute
+  '/chatbot': typeof LayoutChatbotRoute
   '/generate-video': typeof LayoutGenerateVideoRoute
   '/settings': typeof LayoutSettingsRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
-  '/admin': typeof LayoutAdminRoute
+  '/chatbot': typeof LayoutChatbotRoute
   '/generate-video': typeof LayoutGenerateVideoRoute
   '/settings': typeof LayoutSettingsRoute
   '/': typeof LayoutIndexRoute
@@ -64,21 +64,21 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_layout': typeof LayoutRouteWithChildren
   '/login': typeof LoginRoute
-  '/_layout/admin': typeof LayoutAdminRoute
+  '/_layout/chatbot': typeof LayoutChatbotRoute
   '/_layout/generate-video': typeof LayoutGenerateVideoRoute
   '/_layout/settings': typeof LayoutSettingsRoute
   '/_layout/': typeof LayoutIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/admin' | '/generate-video' | '/settings'
+  fullPaths: '/' | '/login' | '/chatbot' | '/generate-video' | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/admin' | '/generate-video' | '/settings' | '/'
+  to: '/login' | '/chatbot' | '/generate-video' | '/settings' | '/'
   id:
     | '__root__'
     | '/_layout'
     | '/login'
-    | '/_layout/admin'
+    | '/_layout/chatbot'
     | '/_layout/generate-video'
     | '/_layout/settings'
     | '/_layout/'
@@ -126,25 +126,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutGenerateVideoRouteImport
       parentRoute: typeof LayoutRoute
     }
-    '/_layout/admin': {
-      id: '/_layout/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof LayoutAdminRouteImport
+    '/_layout/chatbot': {
+      id: '/_layout/chatbot'
+      path: '/chatbot'
+      fullPath: '/chatbot'
+      preLoaderRoute: typeof LayoutChatbotRouteImport
       parentRoute: typeof LayoutRoute
     }
   }
 }
 
 interface LayoutRouteChildren {
-  LayoutAdminRoute: typeof LayoutAdminRoute
+  LayoutChatbotRoute: typeof LayoutChatbotRoute
   LayoutGenerateVideoRoute: typeof LayoutGenerateVideoRoute
   LayoutSettingsRoute: typeof LayoutSettingsRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
-  LayoutAdminRoute: LayoutAdminRoute,
+  LayoutChatbotRoute: LayoutChatbotRoute,
   LayoutGenerateVideoRoute: LayoutGenerateVideoRoute,
   LayoutSettingsRoute: LayoutSettingsRoute,
   LayoutIndexRoute: LayoutIndexRoute,

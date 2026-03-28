@@ -36,8 +36,10 @@ export type UserPublic = {
 
 export type UserPublicKC = {
     name: string;
-    email: (string | null);
+    email: string;
     created_at?: (string | null);
+    is_superuser?: boolean;
+    id: string;
 };
 
 export type UsersPublic = {
@@ -63,8 +65,27 @@ export type ValidationError = {
     type: string;
 };
 
-export type VideoPublic = {
-    file_path: string;
+/**
+ * Represents a generated video object.
+ */
+export type VideoObject = {
+    id: string;
+    object: "video";
+    status: string;
+    created_at?: (number | null);
+    completed_at?: (number | null);
+    expires_at?: (number | null);
+    error?: ({
+    [key: string]: unknown;
+} | null);
+    progress?: (number | null);
+    remixed_from_video_id?: (string | null);
+    seconds?: (string | null);
+    size?: (string | null);
+    model?: (string | null);
+    usage?: ({
+    [key: string]: unknown;
+} | null);
 };
 
 export type AuthLoginPageData = {
@@ -72,12 +93,6 @@ export type AuthLoginPageData = {
 };
 
 export type AuthLoginPageResponse = (unknown);
-
-export type AuthLoginPage1Data = {
-    redirectTarget?: (string | null);
-};
-
-export type AuthLoginPage1Response = (unknown);
 
 export type AuthOauthCallbackResponse = (unknown);
 
@@ -87,11 +102,13 @@ export type AuthPublicKeysResponse = ({
     [key: string]: unknown;
 });
 
-export type LlmsGenerateVideoData = {
-    prompt: string;
+export type LlmsVideosPostData = {
+    userId: string;
 };
 
-export type LlmsGenerateVideoResponse = (VideoPublic);
+export type LlmsVideosPostResponse = (VideoObject);
+
+export type LlmsVideosGetResponse = (VideoObject);
 
 export type LlmsProcessChatData = {
     requestBody: ChatRequest;
